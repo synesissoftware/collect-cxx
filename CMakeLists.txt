@@ -100,6 +100,7 @@ option(BUILD_EXAMPLES "Build examples" ON)
 # - BDUT - required for testing;
 # - Diagnosticism - required for testing;
 # - STLSoft - required for testing;
+# - xTests - required for testing;
 #
 # optional:
 #
@@ -160,6 +161,19 @@ if(BUILD_TESTING)
 
 		include_directories(${STLSOFT_INCLUDE_DIR})
 	endif()
+endif(BUILD_TESTING)
+
+
+# ############################
+# xTests
+
+if(BUILD_TESTING)
+
+	set(xTests_REQUIRED_VERSION_ 0.26)
+
+	find_package(xTests ${xTests_REQUIRED_VERSION_} REQUIRED)
+
+	message("-- CMake package xTests found (version ${xTests_VERSION}; ${xTests_REQUIRED_VERSION_} requested)")
 endif(BUILD_TESTING)
 
 

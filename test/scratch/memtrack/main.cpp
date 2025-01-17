@@ -1,4 +1,6 @@
 
+#include <collect-cxx/slist-vec.hpp>
+
 #include <collect-cxx/common.hpp>
 
 #include <stlsoft/memory/allocator_base.hpp>
@@ -11,6 +13,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <numeric>
 #include <typeinfo>
 #include <vector>
 
@@ -23,6 +26,18 @@ template <typename T_container>
 void test_()
 {
     typedef T_container                                     container_t;
+    typedef typename container_t::allocator_type            allocator_t;
+    typedef typename container_t::value_type                value_t;
+
+    // const bool is_slv = std::is_same<slist_vec, T_list>::value;
+    const bool is_deq   =   std::is_same<container_t, std::deque<value_t, allocator_t>>::value;
+    const bool is_flst  =   std::is_same<container_t, std::forward_list<value_t, allocator_t>>::value;
+    const bool is_list  =   std::is_same<container_t, std::list<value_t, allocator_t>>::value;
+
+    const bool has_back =              !is_flst;
+    const bool has_cap  =   !is_deq && !is_flst && !is_list;
+    const bool has_frnt =   true;
+    const bool has_size =              !is_flst;
 
     std::cout << typeid(container_t).name() << ':' << std::endl;
 
@@ -30,12 +45,24 @@ void test_()
     std::cout << '\t' << "construct (default):" << std::endl;
     {
         container_t c;
+
+        if constexpr (has_cap) c.capacity();
+        c.empty();
+        if constexpr (has_size) c.size();
+
+        c.get_allocator();
     }
 
 
     std::cout << '\t' << "construct (init-list):" << std::endl;
     {
         container_t c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+        std::accumulate(c.cbegin(), c.cend(), 0);
+        std::accumulate(c.begin(), c.end(), 0);
+
+        if constexpr (has_frnt) c.front();
+        if constexpr (has_back) c.back();
     }
 
 
@@ -201,14 +228,14 @@ int main(int /* argc */, char* /* argv */[])
 {
     typedef tracking_alocator<int>                          int_ator_t;
 
-    test_<std::deque<int, int_ator_t>>();
-    test_<std::forward_list<int, int_ator_t>>();
-    test_<std::list<int, int_ator_t>>();
-    test_<std::vector<int, int_ator_t>>();
-
     {
-        std::cout << std::endl;
-
+        running_allocation  =   0;
+        total_allocation    =   0;
+        num_allocations     =   0;
+        num_deallocations   =   0;
+    }
+    test_<std::deque<int, int_ator_t>>();
+    {
         std::cout << "memory tracking:" << std::endl;
 
         std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
@@ -216,6 +243,84 @@ int main(int /* argc */, char* /* argv */[])
 
         std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
         std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
+
+        std::cout << std::endl;
+    }
+
+    {
+        running_allocation  =   0;
+        total_allocation    =   0;
+        num_allocations     =   0;
+        num_deallocations   =   0;
+    }
+    test_<std::forward_list<int, int_ator_t>>();
+    {
+        std::cout << "memory tracking:" << std::endl;
+
+        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
+        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
+
+        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
+        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
+
+        std::cout << std::endl;
+    }
+
+    {
+        running_allocation  =   0;
+        total_allocation    =   0;
+        num_allocations     =   0;
+        num_deallocations   =   0;
+    }
+    test_<std::list<int, int_ator_t>>();
+    {
+        std::cout << "memory tracking:" << std::endl;
+
+        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
+        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
+
+        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
+        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
+
+        std::cout << std::endl;
+    }
+
+    {
+        running_allocation  =   0;
+        total_allocation    =   0;
+        num_allocations     =   0;
+        num_deallocations   =   0;
+    }
+    test_<std::vector<int, int_ator_t>>();
+    {
+        std::cout << "memory tracking:" << std::endl;
+
+        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
+        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
+
+        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
+        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
+
+        std::cout << std::endl;
+    }
+
+    {
+        running_allocation  =   0;
+        total_allocation    =   0;
+        num_allocations     =   0;
+        num_deallocations   =   0;
+    }
+    test_<collect_cxx::slist_vec<int, int_ator_t>>();
+    {
+        std::cout << "memory tracking:" << std::endl;
+
+        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
+        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
+
+        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
+        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
+
+        std::cout << std::endl;
     }
 
     return EXIT_SUCCESS;

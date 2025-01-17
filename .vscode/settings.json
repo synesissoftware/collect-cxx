@@ -87,6 +87,7 @@
 		"exception": "cpp",
 		"execution": "cpp",
 		"format": "cpp",
+		"forward_list": "cpp",
 		"functional": "cpp",
 		"implicit_link.h": "c",
 		"initializer_list": "cpp",

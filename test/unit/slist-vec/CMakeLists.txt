@@ -1,0 +1,2 @@
+define_automated_test_program(test.unit.slist-vec entry.cpp)
+
