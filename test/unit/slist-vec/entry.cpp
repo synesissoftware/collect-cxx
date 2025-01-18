@@ -47,6 +47,10 @@ namespace
     void TEST_ctor_default();
     void TEST_ctor_init_list_1();
     void TEST_ctor_init_list_2();
+    void TEST_ctor_copy_1();
+    void TEST_ctor_copy_2();
+    void TEST_ctor_move_1();
+    void TEST_ctor_move_2();
 
     void TEST_erase_after_p_1();
     void TEST_erase_after_p_2();
@@ -101,6 +105,11 @@ int main(int argc, char *argv[])
         XTESTS_RUN_CASE(TEST_ctor_default);
         XTESTS_RUN_CASE(TEST_ctor_init_list_1);
         XTESTS_RUN_CASE(TEST_ctor_init_list_2);
+        XTESTS_RUN_CASE(TEST_ctor_copy_1);
+        XTESTS_RUN_CASE(TEST_ctor_copy_2);
+        XTESTS_RUN_CASE(TEST_ctor_move_1);
+        XTESTS_RUN_CASE(TEST_ctor_move_2);
+
 
         XTESTS_RUN_CASE(TEST_erase_after_p_1);
         XTESTS_RUN_CASE(TEST_erase_after_p_2);
@@ -219,6 +228,110 @@ void TEST_ctor_init_list_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(271, std::accumulate(c.begin(), c.end(), 0));
+    }
+}
+
+void TEST_ctor_copy_1()
+{
+    {
+        std::forward_list<int>      c0;
+        std::forward_list<int>      c(c0);
+
+        TEST_BOOLEAN_TRUE(c.empty());
+
+        TEST_EQ(c.cend(), c.cbegin());
+        TEST_EQ(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(0, std::accumulate(c.begin(), c.end(), 0));
+    }
+
+    {
+        collect_cxx::slist_vec<int> c0;
+        collect_cxx::slist_vec<int> c(c0);
+
+        TEST_BOOLEAN_TRUE(c.empty());
+
+        TEST_EQ(c.cend(), c.cbegin());
+        TEST_EQ(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(0, std::accumulate(c.begin(), c.end(), 0));
+    }
+}
+
+void TEST_ctor_copy_2()
+{
+    {
+        std::forward_list<int>      c0 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        std::forward_list<int>      c(c0);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_NE(c.cend(), c.cbegin());
+        TEST_NE(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+    }
+
+    {
+        collect_cxx::slist_vec<int> c0 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        collect_cxx::slist_vec<int> c(c0);
+
+        TEST_INTEGER_EQUAL(21, c.capacity());
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(10, c.size());
+
+        TEST_NE(c.cend(), c.cbegin());
+        TEST_NE(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+    }
+}
+
+void TEST_ctor_move_1()
+{
+    {
+        std::forward_list<int>      c0;
+        std::forward_list<int>      c(std::move(c0));
+
+        TEST_BOOLEAN_TRUE(c.empty());
+
+        TEST_EQ(c.cend(), c.cbegin());
+        TEST_EQ(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(0, std::accumulate(c.begin(), c.end(), 0));
+    }
+
+    {
+        collect_cxx::slist_vec<int> c0;
+        collect_cxx::slist_vec<int> c(std::move(c0));
+
+        TEST_BOOLEAN_TRUE(c.empty());
+
+        TEST_EQ(c.cend(), c.cbegin());
+        TEST_EQ(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(0, std::accumulate(c.begin(), c.end(), 0));
+    }
+}
+
+void TEST_ctor_move_2()
+{
+    {
+        std::forward_list<int>      c0 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        std::forward_list<int>      c(std::move(c0));
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_NE(c.cend(), c.cbegin());
+        TEST_NE(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+    }
+
+    {
+        collect_cxx::slist_vec<int> c0 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        collect_cxx::slist_vec<int> c(std::move(c0));
+
+        TEST_INTEGER_EQUAL(21, c.capacity());
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(10, c.size());
+
+        TEST_NE(c.cend(), c.cbegin());
+        TEST_NE(c.end(), c.begin());
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
     }
 }
 

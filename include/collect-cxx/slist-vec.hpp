@@ -170,12 +170,16 @@ public: // construction
     slist_vec();
     /// Constructs an instance containing the elements provide by ilist.
     slist_vec(std::initializer_list<value_type> ilist);
-private:
-    // NOTE: not currently implemented
-    slist_vec(class_type const&) = delete;
-    // NOTE: not currently implemented
-    void operator =(class_type const&) = delete;
-public:
+    /// @brief T.B.C.
+    /// @param T.B.C.
+    slist_vec(class_type const&);
+    /// @brief T.B.C.
+    /// @param T.B.C.
+    slist_vec(class_type&&);
+    /// @brief T.B.C.
+    /// @param T.B.C.
+    class_type& operator =(class_type const&);
+
     /// @brief Returns the allocator associated with the instance.
     allocator_type get_allocator() const;
 
@@ -389,7 +393,14 @@ template <typename T_value, typename T_allocator>
 slist_vec<T_value, T_allocator>::slist_vec()
     : m_capacity(0)
     , m_size(0)
+#if 0
+
+    , m_active_block_list()
+    , m_spare_block_list()
+#else
+
     , m_block_list()
+#endif
     , m_bbegin({ nullptr, nullptr, value_type() })
     , m_last(nullptr)
 {}
@@ -398,13 +409,62 @@ template <typename T_value, typename T_allocator>
 slist_vec<T_value, T_allocator>::slist_vec(std::initializer_list<value_type> ilist)
     : m_capacity(0)
     , m_size(0)
+#if 0
+
+    , m_active_block_list()
+    , m_spare_block_list()
+#else
+
     , m_block_list()
+#endif
     , m_bbegin({ nullptr, nullptr, value_type() })
     , m_last(nullptr)
 {
     for (value_type const& value : ilist)
     {
         push_back(value);
+    }
+}
+
+template <typename T_value, typename T_allocator>
+slist_vec<T_value, T_allocator>::slist_vec(class_type const& rhs)
+    : m_capacity(0)
+    , m_size(0)
+    , m_block_list()
+    , m_bbegin({ nullptr, nullptr, value_type() })
+    , m_last(nullptr)
+{
+    for (value_type const& value : rhs)
+    {
+        push_back(value);
+    }
+}
+
+template <typename T_value, typename T_allocator>
+slist_vec<T_value, T_allocator>::slist_vec(class_type&& rhs)
+    : m_capacity()
+    , m_size()
+    , m_block_list()
+    , m_bbegin()
+    , m_last()
+{
+    struct entry* const e = rhs.end_();
+
+    std::swap(m_capacity, rhs.m_capacity);
+    std::swap(m_size, rhs.m_size);
+    std::swap(m_block_list, rhs.m_block_list);
+    std::swap(m_bbegin, rhs.m_bbegin);
+    std::swap(m_last, rhs.m_last);
+
+    for (auto& block : m_block_list)
+    {
+        for (auto& entry : block.entries)
+        {
+            if (e == entry.next)
+            {
+                entry.next = end_();
+            }
+        }
     }
 }
 
