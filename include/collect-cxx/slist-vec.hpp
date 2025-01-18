@@ -12,6 +12,12 @@
 namespace collect_cxx {
 
 
+/** T.B.C.
+ *
+ * @tparam T_value The value type;
+ * @tparam T_allocator The allocator type, which defaults to
+ *  std::allocator<T_value>;
+ */
 template<
     typename T_value
 ,   typename T_allocator = std::allocator<T_value>
@@ -20,17 +26,27 @@ class slist_vec
     : private T_allocator
 {
 public: // types
+    /// The current specialisation of the type.
     typedef slist_vec<
         T_value
     ,   T_allocator
     >                                                       class_type;
+#ifndef COLLECT_CXX_DOCUMENTATION_SKIP_SECTION
     typedef class_type                                      container_type;
+#endif /* !COLLECT_CXX_DOCUMENTATION_SKIP_SECTION */
+    /// The value type.
     typedef T_value                                         value_type;
+    /// The allocator type.
     typedef T_allocator                                     allocator_type;
+    /// The allocator traits type.
     typedef std::allocator_traits<allocator_type>           allocator_traits_type;
+    /// The mutable (non-const) reference type.
     typedef value_type&                                     reference;
+    /// The non-mutable (const) reference type.
     typedef value_type const&                               const_reference;
+    /// The difference type.
     typedef std::ptrdiff_t                                  difference_type;
+    /// The size type.
     typedef std::size_t                                     size_type;
 private:
     struct block;
@@ -75,6 +91,7 @@ private:
     ,   block_ator_type_
     >                                                       block_list_type_;
 public:
+    /// The non-mutating (const) iterator type.
     class const_iterator
     {
     private:
@@ -149,16 +166,31 @@ public:
 
 
 public: // construction
+    /// Default constructor.
     slist_vec();
-    slist_vec(std::initializer_list<value_type>);
-
+    /// Constructs an instance containing the elements provide by ilist.
+    slist_vec(std::initializer_list<value_type> ilist);
+private:
+    // NOTE: not currently implemented
+    slist_vec(class_type const&) = delete;
+    // NOTE: not currently implemented
+    void operator =(class_type const&) = delete;
+public:
+    /// @brief Returns the allocator associated with the instance.
     allocator_type get_allocator() const;
 
-    void swap(class_type&) noexcept;
+    /// @brief Exchanges the contents of the instance with rhs.
+    ///
+    /// @param rhs The instance with which to exchange.
+    void swap(class_type& rhs) noexcept;
 
 public: // attributes
+    /// @brief Indicates the number of elements for which the instance is
+    ///  holding space that would not require further allocation.
     size_type capacity() const noexcept;
+    /// @brief Indicates the number of elements in the instance.
     size_type size() const noexcept;
+    /// @brief Indicates whether the instance is empty.
     bool empty() const noexcept;
 
 
@@ -190,8 +222,16 @@ public: // modifiers
 
 
 public: // iteration
+    /// Returns a pseudo-iterator to the element before the first element in
+    /// the instance. This element acts as a placeholder only - attempting
+    /// to dereference it results in undefined behavior. The only valid uses
+    /// are to pass it to functions insert_after(), emplace_after(),
+    /// erase_after(), splice_after() and to invoke its increment operator:
+    /// incrementing the before-begin iterator gives exactly the same
+    /// iterator as obtained from begin()/cbegin().
     const_iterator
     cbefore_begin() const;
+    /// @see cbefore_begin
     const_iterator
     before_begin() const;
 
@@ -206,9 +246,25 @@ public: // iteration
 
 
 public: // element access
+    /// @brief Mutating (non-const) reference to the first element in the
+    ///  instance.
+    ///
+    /// @pre !empty()
     reference front() noexcept;
+    /// @brief Non-utating (const) reference to the first element in the
+    ///  instance.
+    ///
+    /// @pre !empty()
     const_reference front() const noexcept;
+    /// @brief Mutating (non-const) reference to the last element in the
+    ///  instance.
+    ///
+    /// @pre !empty()
     reference back() noexcept;
+    /// @brief Non-utating (const) reference to the last element in the
+    ///  instance.
+    ///
+    /// @pre !empty()
     const_reference back() const noexcept;
 
 private: // implementation
