@@ -48,7 +48,8 @@ namespace
     void TEST_ctor_init_list_1();
     void TEST_ctor_init_list_2();
 
-    void TEST_erase_after_1();
+    void TEST_erase_after_p_1();
+    void TEST_erase_after_p_2();
 } // anonymous namespace
 
 
@@ -69,7 +70,8 @@ int main(int argc, char *argv[])
         XTESTS_RUN_CASE(TEST_ctor_init_list_1);
         XTESTS_RUN_CASE(TEST_ctor_init_list_2);
 
-        XTESTS_RUN_CASE(TEST_erase_after_1);
+        XTESTS_RUN_CASE(TEST_erase_after_p_1);
+        XTESTS_RUN_CASE(TEST_erase_after_p_2);
 
         XTESTS_PRINT_RESULTS();
 
@@ -186,7 +188,68 @@ void TEST_ctor_init_list_2()
     }
 }
 
-void TEST_erase_after_1()
+void TEST_erase_after_p_1()
+{
+    // std::forward_list<int>
+    {
+        {
+            std::forward_list<int>  c;
+
+            // each of the following is UB
+
+            // c.erase_after(c.before_begin());
+            // c.erase_after(c.begin());
+        }
+
+    }
+
+    {
+        std::forward_list<int>      c = { 1234, 6789 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(8023, std::accumulate(c.begin(), c.end(), 0));
+
+        auto i = c.erase_after(c.begin());
+
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(c.end(), i);
+
+#if 0 // std::forward_list can't do this
+
+        c.erase_after(c.begin());
+
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+#endif
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 1234, 6789 };
+
+        TEST_INTEGER_EQUAL(29, c.capacity());
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(2, c.size());
+        TEST_INTEGER_EQUAL(8023, std::accumulate(c.begin(), c.end(), 0));
+
+        c.erase_after(c.begin());
+
+        TEST_INTEGER_EQUAL(30, c.capacity());
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(1, c.size());
+        TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+
+        c.erase_after(c.begin());
+
+        TEST_INTEGER_EQUAL(30, c.capacity());
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(1, c.size());
+        TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+    }
+}
+
+void TEST_erase_after_p_2()
 {
     {
         std::forward_list<int>      c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -199,19 +262,24 @@ void TEST_erase_after_1()
         auto i3 = c.begin(); ++i3; ++i3; ++i3;
 #endif
 
-        c.erase_after(i3);
+        auto i = c.erase_after(i3);
 
         TEST_BOOLEAN_FALSE(c.empty());
 
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(41, std::accumulate(c.begin(), c.end(), 0));
-    }
 
-#if 0
+        TEST_NE(c.end(), i);
+        TEST_INTEGER_EQUAL(5, *i);
+    }
 
     {
         collect_cxx::slist_vec<int> c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+        TEST_INTEGER_EQUAL(21, c.capacity());
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(10, c.size());
 
 #if 0
 
@@ -229,9 +297,8 @@ void TEST_erase_after_1()
 
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
-        TEST_INTEGER_EQUAL(44, std::accumulate(c.begin(), c.end(), 0));
+        TEST_INTEGER_EQUAL(41, std::accumulate(c.begin(), c.end(), 0));
     }
-#endif
 }
 } // anonymous namespace
 

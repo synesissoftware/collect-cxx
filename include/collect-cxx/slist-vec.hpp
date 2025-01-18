@@ -33,22 +33,30 @@ public: // types
     typedef std::ptrdiff_t                                  difference_type;
     typedef std::size_t                                     size_type;
 private:
+    struct block;
     struct entry
     {
 //      entry*      prev;
         entry*      next;
+        block*      block;
         value_type  value;
     };
     struct block
     {
+    private:
+        friend class slist_vec<T_value, T_allocator>;
+
+    public: // fields
         size_type               num_used;
 //      std::array<entry, 20>   entries;
         std::array<entry, 31>   entries;
 
+    public: // construction
         block(value_type const& value, entry* next);
         block(value_type&& value, entry* next);
 //      block(std::initializer_list<value_type> ilist);
 
+    public: // attributes
         size_type capacity() const noexcept;
         size_type size() const noexcept;
         bool empty() const noexcept;
@@ -64,12 +72,15 @@ private:
 public:
     class const_iterator
     {
+    private:
+        friend class slist_vec<T_value, T_allocator>;
+
     public: // types
         typedef typename container_type::difference_type        difference_type;
 
     public: // construction
         const_iterator(
-            entry const*    pentry
+            entry*          pentry
         ,   entry const*    pend
         )
             : m_pentry(pentry)
@@ -116,9 +127,19 @@ public:
         }
 
 
+    private: // attributes
+        entry const*    entry_() const noexcept
+        {
+            return m_pentry;
+        }
+        entry*          entry_() noexcept
+        {
+            return m_pentry;
+        }
+
     private: // fields
-        entry const*    m_pentry;
-        entry const*    m_pend;
+        entry*              m_pentry;
+        entry const* const  m_pend;
     };
 
 
@@ -137,6 +158,17 @@ public: // attributes
 
 
 public: // modifiers
+    /// T.B.C.
+    ///
+    /// @param pos A valid iterator refering to an element after which a
+    ///  single element, if present, is to be removed;
+    ///
+    /// @pre !empty()
+    void
+    erase_after(
+        const_iterator  pos
+    );
+
     void push_back(value_type const& value);
     void push_back(value_type&& value);
 
@@ -222,7 +254,7 @@ slist_vec<T_value, T_allocator>::block::block(
 ,   entry*                                                      next
 )
     : num_used(1)
-    , entries({ { { next, value } } })
+    , entries({ { { next, this, value } } })
 {
 //	entries[0] = { next, value };
 
@@ -458,18 +490,61 @@ slist_vec<T_value, T_allocator>::push_back(value_type const& value)
 
                 struct entry& e = *i;
 
-                e.value = value;
                 e.next = end_();
+                e.block = &block;
+                e.value = value;
+
                 m_last->next = &e;
                 m_last = &e;
 
                 block.num_used += 1;
-                m_capacity -= 1;
-                m_size += 1;
+
+                --m_capacity;
+                ++m_size;
 
                 break;
             }
         }
+    }
+}
+
+
+template <typename T_value, typename T_allocator>
+void
+slist_vec<T_value, T_allocator>::erase_after(
+    const_iterator  pos
+)
+{
+    assert(end() != pos);
+
+    struct entry* const e_ref   =   pos.entry_();
+    struct entry* const e_next  =   e_ref->next;
+
+    if (end_() == e_next)
+    {
+        // return end();
+    }
+    else
+    {
+        // need to:
+        //
+        // - "remove" e_next from the list, tying e_ref to e_next->next
+        // - "reset" e_next
+        // - adjust the block attributes
+        // - adjust the container attributes
+
+        struct block* const b_next = e_next->block;
+
+
+        e_ref->next     =   e_next->next;
+
+        e_next->value   =   value_type();
+        e_next->next    =   nullptr; // this marks the element as unused
+
+        --b_next->num_used;
+
+        ++m_capacity;
+        --m_size;
     }
 }
 
