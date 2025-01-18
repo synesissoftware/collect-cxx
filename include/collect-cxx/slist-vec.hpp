@@ -52,9 +52,14 @@ private:
         std::array<entry, 31>   entries;
 
     public: // construction
-        block(value_type const& value, entry* next);
-        block(value_type&& value, entry* next);
-//      block(std::initializer_list<value_type> ilist);
+        block();
+
+    public: // operations
+        void
+        push_first_(
+            value_type const&   value
+        ,   entry*              next
+        );
 
     public: // attributes
         size_type capacity() const noexcept;
@@ -169,11 +174,27 @@ public: // modifiers
         const_iterator  pos
     );
 
+    /// T.B.C.
+    ///
+    /// @pre !empty()
+    /// @pre from != to
+    /// @pre from != end()
+    void
+    erase_after(
+        const_iterator  from
+    ,   const_iterator  to
+    );
+
     void push_back(value_type const& value);
     void push_back(value_type&& value);
 
 
 public: // iteration
+    const_iterator
+    cbefore_begin() const;
+    const_iterator
+    before_begin() const;
+
     const_iterator
     cbegin() const;
     const_iterator
@@ -192,6 +213,8 @@ public: // element access
 
 private: // implementation
     entry*
+    bbegin_() const noexcept;
+    entry*
     end_() const noexcept;
 
 private: // fields
@@ -205,7 +228,7 @@ private: // fields
 
     block_list_type_    m_block_list;   // blocks
 #endif
-    entry*              m_first;        // pointer to the first block in the list
+    struct entry        m_bbegin;       // special entry holding first block in list, and able to provide before_begin
     entry*              m_last;         // pointer to the last block in the list
 };
 
@@ -236,31 +259,27 @@ operator !=(
 }
 
 
-// implementation
-
-
-template <typename T_value, typename T_allocator>
-typename slist_vec<T_value, T_allocator>::entry*
-slist_vec<T_value, T_allocator>::end_() const noexcept
-{
-    return reinterpret_cast<entry*>(const_cast<class_type*>(this));
-}
-
-#if 1
+// slist_vec<>::block
 
 template <typename T_value, typename T_allocator>
-slist_vec<T_value, T_allocator>::block::block(
+slist_vec<T_value, T_allocator>::block::block()
+    : num_used(0)
+    , entries()
+{}
+
+template <typename T_value, typename T_allocator>
+void
+slist_vec<T_value, T_allocator>::block::push_first_(
     typename slist_vec<T_value, T_allocator>::value_type const& value
-,   entry*                                                      next
+,   typename slist_vec<T_value, T_allocator>::entry*            next
 )
-    : num_used(1)
-    , entries({ { { next, this, value } } })
 {
-//	entries[0] = { next, value };
+    assert(0 == num_used);
+    assert(nullptr == entries[0].next);
 
-    assert(31 == entries.size());
+    entries[0] = { next, this, value };
+    ++num_used;
 }
-#endif
 
 template <typename T_value, typename T_allocator>
 typename slist_vec<T_value, T_allocator>::size_type
@@ -290,12 +309,32 @@ slist_vec<T_value, T_allocator>::block::full() const noexcept
     return 0 == capacity();
 }
 
+
+// slist_vec<> : implementation
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::entry*
+slist_vec<T_value, T_allocator>::bbegin_() const noexcept
+{
+    return const_cast<entry*>(&m_bbegin);
+}
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::entry*
+slist_vec<T_value, T_allocator>::end_() const noexcept
+{
+    return reinterpret_cast<entry*>(const_cast<class_type*>(this));
+}
+
+
+// slist_vec<> : construction
+
 template <typename T_value, typename T_allocator>
 slist_vec<T_value, T_allocator>::slist_vec()
     : m_capacity(0)
     , m_size(0)
     , m_block_list()
-    , m_first(nullptr)
+    , m_bbegin({ nullptr, nullptr, value_type() })
     , m_last(nullptr)
 {}
 
@@ -304,7 +343,7 @@ slist_vec<T_value, T_allocator>::slist_vec(std::initializer_list<value_type> ili
     : m_capacity(0)
     , m_size(0)
     , m_block_list()
-    , m_first(nullptr)
+    , m_bbegin({ nullptr, nullptr, value_type() })
     , m_last(nullptr)
 {
     for (value_type const& value : ilist)
@@ -320,7 +359,6 @@ slist_vec<T_value, T_allocator>::get_allocator() const
     return allocator_type(*this);
 }
 
-
 template <typename T_value, typename T_allocator>
 void
 slist_vec<T_value, T_allocator>::swap(class_type& rhs) noexcept
@@ -335,18 +373,12 @@ slist_vec<T_value, T_allocator>::swap(class_type& rhs) noexcept
 
     std::swap(m_block_list, rhs.m_block_list);
 #endif
-    std::swap(m_first, rhs.m_first);
+    std::swap(m_bbegin.next, rhs.m_bbegin.next);
     std::swap(m_last, rhs.m_last);
 }
 
 
-#if 0
-
-slist_vec::block::block(std::initializer_list<int> ilist)
-    : num_used(ilist.size())
-    , entries(ilist)
-{}
-#endif
+// slist_vec<> : attributes
 
 template <typename T_value, typename T_allocator>
 typename slist_vec<T_value, T_allocator>::size_type
@@ -369,16 +401,33 @@ slist_vec<T_value, T_allocator>::empty() const noexcept
     return 0 == size();
 }
 
+
+// slist_vec<> : iteration
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::const_iterator
+slist_vec<T_value, T_allocator>::cbefore_begin() const
+{
+    return const_iterator(bbegin_(), end_());
+}
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::const_iterator
+slist_vec<T_value, T_allocator>::before_begin() const
+{
+    return cbefore_begin();
+}
+
 template <typename T_value, typename T_allocator>
 typename slist_vec<T_value, T_allocator>::const_iterator
 slist_vec<T_value, T_allocator>::cbegin() const
 {
-    if (nullptr == m_first)
+    if (nullptr == m_bbegin.next)
     {
         return cend();
     }
 
-    return const_iterator(m_first, end_());
+    return const_iterator(m_bbegin.next, end_());
 }
 
 template <typename T_value, typename T_allocator>
@@ -403,14 +452,16 @@ slist_vec<T_value, T_allocator>::end() const
 }
 
 
+// slist_vec<> : element access
+
 template <typename T_value, typename T_allocator>
 typename slist_vec<T_value, T_allocator>::reference
 slist_vec<T_value, T_allocator>::front() noexcept
 {
     assert(!empty());
-    assert(nullptr != m_first);
+    assert(nullptr != m_bbegin.next);
 
-    return m_first->value;
+    return m_bbegin.next->value;
 }
 
 template <typename T_value, typename T_allocator>
@@ -418,9 +469,9 @@ typename slist_vec<T_value, T_allocator>::const_reference
 slist_vec<T_value, T_allocator>::front() const noexcept
 {
     assert(!empty());
-    assert(nullptr != m_first);
+    assert(nullptr != m_bbegin.next);
 
-    return m_first->value;
+    return m_bbegin.next->value;
 }
 
 template <typename T_value, typename T_allocator>
@@ -444,27 +495,130 @@ slist_vec<T_value, T_allocator>::back() const noexcept
 }
 
 
+// slist_vec<> : modifiers
+
+template <typename T_value, typename T_allocator>
+void
+slist_vec<T_value, T_allocator>::erase_after(
+    const_iterator  pos
+)
+{
+    assert(end() != pos);
+
+    struct entry* const e_ref   =   pos.entry_();
+    struct entry* const e_next  =   e_ref->next;
+
+    if (end_() == e_next)
+    {
+        // return end();
+    }
+    else
+    {
+        // need to:
+        //
+        // - "remove" e_next from the list, tying e_ref to e_next->next
+        // - "reset" e_next
+        // - adjust the block attributes
+        // - adjust the container attributes
+
+        struct block* const b_next = e_next->block;
+
+
+        e_ref->next     =   e_next->next;
+
+        e_next->value   =   value_type();
+        e_next->next    =   nullptr; // this marks the element as unused
+
+        --b_next->num_used;
+
+        ++m_capacity;
+        --m_size;
+
+        if (b_next->empty())
+        {
+            // TODO: free, or put onto spare list
+        }
+    }
+}
+
+template <typename T_value, typename T_allocator>
+void
+// iterator
+slist_vec<T_value, T_allocator>::erase_after(
+    const_iterator  from
+,   const_iterator  to
+)
+{
+    assert(end() != from);
+    assert(to != from); // this violates the contract
+
+    if (from == to)
+    {
+        // return ???;
+    }
+    else
+    {
+        struct entry* const e_ref   =   from.entry_();
+        struct entry*       e_next  =   e_ref->next;
+
+        struct entry* const e_to    =   to.entry_();
+
+        assert(e_to != e_ref);
+
+        if (e_next == e_to)
+        {
+            // return ???;
+        }
+        else
+        {
+            for ( ; e_to != e_next; )
+            {
+                struct entry* const e_curr = e_next;
+
+                struct block* const b_curr = e_curr->block;
+
+                e_ref->next     =   e_curr->next;
+                e_next          =   e_curr->next;
+
+                e_curr->value   =   value_type();
+                e_curr->next    =   nullptr; // this marks the element as unused
+
+                --b_curr->num_used;
+
+                if (b_curr->empty())
+                {
+                    // TODO: free, or put onto spare list
+                }
+
+                ++m_capacity;
+                --m_size;
+            }
+        }
+    }
+}
+
 template <typename T_value, typename T_allocator>
 void
 slist_vec<T_value, T_allocator>::push_back(value_type const& value)
 {
     if (0 == capacity())
     {
-        m_block_list.push_back(block(value, end_()));
-        //m_block_list.emplace_back(value);
+        m_block_list.push_back(block());
 
         struct block& last_block = m_block_list.back();
+
+        last_block.push_first_(value, end_());
 
         m_capacity += last_block.capacity();
         m_size += 1;
 
         struct entry& e = last_block.entries[0];
 
-        if (nullptr == m_first)
+        if (nullptr == m_bbegin.next)
         {
             assert(nullptr == m_last);
 
-            m_last = m_first = &e;
+            m_last = m_bbegin.next = &e;
         }
         else
         {
@@ -505,46 +659,6 @@ slist_vec<T_value, T_allocator>::push_back(value_type const& value)
                 break;
             }
         }
-    }
-}
-
-
-template <typename T_value, typename T_allocator>
-void
-slist_vec<T_value, T_allocator>::erase_after(
-    const_iterator  pos
-)
-{
-    assert(end() != pos);
-
-    struct entry* const e_ref   =   pos.entry_();
-    struct entry* const e_next  =   e_ref->next;
-
-    if (end_() == e_next)
-    {
-        // return end();
-    }
-    else
-    {
-        // need to:
-        //
-        // - "remove" e_next from the list, tying e_ref to e_next->next
-        // - "reset" e_next
-        // - adjust the block attributes
-        // - adjust the container attributes
-
-        struct block* const b_next = e_next->block;
-
-
-        e_ref->next     =   e_next->next;
-
-        e_next->value   =   value_type();
-        e_next->next    =   nullptr; // this marks the element as unused
-
-        --b_next->num_used;
-
-        ++m_capacity;
-        --m_size;
     }
 }
 
