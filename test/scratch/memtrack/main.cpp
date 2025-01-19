@@ -89,6 +89,23 @@ void test_()
     }
 
 
+    std::cout << '\t' << "assignment operator (copy):" << std::endl;
+    {
+        container_t c0 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        container_t c1;
+
+        c1 = c0;
+    }
+
+
+    std::cout << '\t' << "assignment operator (init-list):" << std::endl;
+    {
+        container_t c;
+
+        c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    }
+
+
     std::cout << std::endl;
 }
 
@@ -98,6 +115,31 @@ std::size_t                         running_allocation  =   0;
 std::size_t                         total_allocation    =   0;
 std::size_t                         num_allocations     =   0;
 std::size_t                         num_deallocations   =   0;
+
+
+void
+display_memory_tracking()
+{
+    std::cout << '\t' << "memory tracking:" << std::endl;
+
+    std::cout << '\t' << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
+    std::cout << '\t' << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
+
+    std::cout << '\t' << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
+    std::cout << '\t' << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
+
+    std::cout << std::endl;
+}
+
+void
+reset_memory_tracking()
+{
+    tracking_numbers.clear();
+    running_allocation  =   0;
+    total_allocation    =   0;
+    num_allocations     =   0;
+    num_deallocations   =   0;
+}
 
 
 template <ss_typename_param_k T>
@@ -228,100 +270,25 @@ int main(int /* argc */, char* /* argv */[])
 {
     typedef tracking_alocator<int>                          int_ator_t;
 
-    {
-        running_allocation  =   0;
-        total_allocation    =   0;
-        num_allocations     =   0;
-        num_deallocations   =   0;
-    }
+    reset_memory_tracking();
     test_<std::deque<int, int_ator_t>>();
-    {
-        std::cout << "memory tracking:" << std::endl;
+    display_memory_tracking();
 
-        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
-        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
-
-        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
-        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
-
-        std::cout << std::endl;
-    }
-
-    {
-        running_allocation  =   0;
-        total_allocation    =   0;
-        num_allocations     =   0;
-        num_deallocations   =   0;
-    }
+    reset_memory_tracking();
     test_<std::forward_list<int, int_ator_t>>();
-    {
-        std::cout << "memory tracking:" << std::endl;
+    display_memory_tracking();
 
-        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
-        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
-
-        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
-        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
-
-        std::cout << std::endl;
-    }
-
-    {
-        running_allocation  =   0;
-        total_allocation    =   0;
-        num_allocations     =   0;
-        num_deallocations   =   0;
-    }
+    reset_memory_tracking();
     test_<std::list<int, int_ator_t>>();
-    {
-        std::cout << "memory tracking:" << std::endl;
+    display_memory_tracking();
 
-        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
-        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
-
-        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
-        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
-
-        std::cout << std::endl;
-    }
-
-    {
-        running_allocation  =   0;
-        total_allocation    =   0;
-        num_allocations     =   0;
-        num_deallocations   =   0;
-    }
+    reset_memory_tracking();
     test_<std::vector<int, int_ator_t>>();
-    {
-        std::cout << "memory tracking:" << std::endl;
+    display_memory_tracking();
 
-        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
-        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
-
-        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
-        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
-
-        std::cout << std::endl;
-    }
-
-    {
-        running_allocation  =   0;
-        total_allocation    =   0;
-        num_allocations     =   0;
-        num_deallocations   =   0;
-    }
+    reset_memory_tracking();
     test_<collect_cxx::slist_vec<int, int_ator_t>>();
-    {
-        std::cout << "memory tracking:" << std::endl;
-
-        std::cout << '\t' << "#allocations:     " << '\t' << std::setw(10) << std::right<< num_allocations << std::endl;
-        std::cout << '\t' << "#deallocations:   " << '\t' << std::setw(10) << std::right<< num_deallocations << std::endl;
-
-        std::cout << '\t' << "total allocated:  " << '\t' << std::setw(10) << std::right<< total_allocation << std::endl;
-        std::cout << '\t' << "current allocated:" << '\t' << std::setw(10) << std::right<< running_allocation << std::endl;
-
-        std::cout << std::endl;
-    }
+    display_memory_tracking();
 
     return EXIT_SUCCESS;
 }

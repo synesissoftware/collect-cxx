@@ -1,3 +1,13 @@
+/* /////////////////////////////////////////////////////////////////////////
+ * File:    include/collect-cxx/slist-vec.hpp
+ *
+ * Purpose: Definition of the `collect_cxx::slist_vec<>` class template.
+ *
+ * Created: 18th January 2025
+ * Updated: 19th January 2025
+ *
+ * ////////////////////////////////////////////////////////////////////// */
+
 
 #include <collect-cxx/common.hpp>
 
@@ -179,6 +189,9 @@ public: // construction
     /// @brief T.B.C.
     /// @param T.B.C.
     class_type& operator =(class_type const&);
+    /// @brief T.B.C.
+    /// @param T.B.C.
+    class_type& operator =(std::initializer_list<value_type> ilist);
 
     /// @brief Returns the allocator associated with the instance.
     allocator_type get_allocator() const;
@@ -199,6 +212,12 @@ public: // attributes
 
 
 public: // modifiers
+    /// T.B.C.
+    ///
+    /// Erases all elements from the instance, but does not clear underlying
+    /// blocks.
+    void clear() noexcept;
+
     /// T.B.C.
     ///
     /// @param pos A valid iterator refering to an element after which a
@@ -272,10 +291,26 @@ public: // element access
     const_reference back() const noexcept;
 
 private: // implementation
+    // Gives the before-begin pointer, obtaining the anchoring entry
     entry*
     bbegin_() const noexcept;
+    // Gives the end pointer, obtaining a non-usable entry
     entry*
     end_() const noexcept;
+
+    /*
+    0 entries:
+     bb | e
+
+    1 entry:
+     bb | 0 | e
+
+    4 entries:
+     bb | 0 | 1 | 2 | 3 | e
+    */
+
+    void
+    clear_without_dropping_blocks_() noexcept;
 
 private: // fields
     size_type           m_capacity;     // capacity
@@ -386,6 +421,34 @@ slist_vec<T_value, T_allocator>::end_() const noexcept
     return reinterpret_cast<entry*>(const_cast<class_type*>(this));
 }
 
+template <typename T_value, typename T_allocator>
+void
+slist_vec<T_value, T_allocator>::clear_without_dropping_blocks_() noexcept
+{
+    if (empty())
+    {
+        return;
+    }
+
+    for (struct entry*& e = bbegin_()->next; end_() != e; )
+    {
+        // struct entry* curr = e;
+        struct entry* next = e->next;
+
+        assert(nullptr != e->next);
+        assert(nullptr != e->block);
+
+        e->value = value_type();
+        e->block = nullptr;
+        e->next = nullptr;
+
+        e = next;
+
+        --m_size;
+        ++m_capacity;
+    }
+}
+
 
 // slist_vec<> : construction
 
@@ -466,6 +529,80 @@ slist_vec<T_value, T_allocator>::slist_vec(class_type&& rhs)
             }
         }
     }
+}
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::class_type&
+slist_vec<T_value, T_allocator>::slist_vec::operator =(class_type const& rhs)
+{
+    clear_without_dropping_blocks_();
+
+    for (value_type const& value : rhs)
+    {
+        push_back(value);
+    }
+
+    return *this;
+}
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::class_type&
+slist_vec<T_value, T_allocator>::slist_vec::operator =(std::initializer_list<value_type> ilist)
+{
+    // as an optimisation we now ensure to obtain all requisite blocks for
+    // the known size of elements
+
+    clear_without_dropping_blocks_();
+
+    while (ilist.size() > capacity())
+    {
+        m_block_list.push_back(block());
+
+        m_capacity += m_block_list.back().capacity();
+    }
+
+    // for each item in ilist add into ready block(s)
+
+    auto    it_block    =   m_block_list.begin();
+    auto    it_values   =   ilist.begin();
+
+    for (size_type n = 0; ilist.end() != it_values; ++it_values)
+    {
+        struct block&       blk             =   *it_block;
+
+        std::size_t const   index_in_block  =   n;
+
+        struct entry&       e               =   blk.entries[index_in_block];
+
+        e.next  =   end_();
+        e.block =   &blk;
+        e.value =   *it_values;
+
+        if (empty())
+        {
+            m_bbegin.next   =   &e;
+        }
+        else
+        {
+            m_last->next    =   &e;
+        }
+
+        m_last = &e;
+
+        ++blk.num_used;
+
+        if (++n == blk.entries.size())
+        {
+            ++it_block;
+
+            n = 0;
+        }
+
+        --m_capacity;
+        ++m_size;
+    }
+
+    return *this;
 }
 
 template <typename T_value, typename T_allocator>
@@ -615,6 +752,13 @@ slist_vec<T_value, T_allocator>::back() const noexcept
 
 template <typename T_value, typename T_allocator>
 void
+slist_vec<T_value, T_allocator>::clear() noexcept
+{
+    clear_without_dropping_blocks_();
+}
+
+template <typename T_value, typename T_allocator>
+void
 slist_vec<T_value, T_allocator>::erase_after(
     const_iterator  pos
 )
@@ -717,30 +861,19 @@ template <typename T_value, typename T_allocator>
 void
 slist_vec<T_value, T_allocator>::push_back(value_type const& value)
 {
+    struct entry* pe = nullptr;
+
     if (0 == capacity())
     {
         m_block_list.push_back(block());
 
         struct block& last_block = m_block_list.back();
 
-        last_block.push_first_(value, end_());
-
         m_capacity += last_block.capacity();
-        m_size += 1;
 
-        struct entry& e = last_block.entries[0];
+        pe = &last_block.entries[0];
 
-        if (nullptr == m_bbegin.next)
-        {
-            assert(nullptr == m_last);
-
-            m_last = m_bbegin.next = &e;
-        }
-        else
-        {
-            m_last->next = &e;
-            m_last = &e;
-        }
+        pe->block = &last_block;
     }
     else
     {
@@ -758,24 +891,36 @@ slist_vec<T_value, T_allocator>::push_back(value_type const& value)
 
                 assert(block.entries.end() != i);
 
-                struct entry& e = *i;
+                pe = &*i;
 
-                e.next = end_();
-                e.block = &block;
-                e.value = value;
-
-                m_last->next = &e;
-                m_last = &e;
-
-                block.num_used += 1;
-
-                --m_capacity;
-                ++m_size;
+                pe->block = &block;
 
                 break;
             }
         }
     }
+
+    assert(nullptr != pe);
+
+    if (empty())
+    {
+        m_bbegin.next = pe;
+    }
+    else
+    {
+        m_last->next = pe;
+    }
+
+    m_last = pe;
+
+    pe->next = end_();
+    pe->value = value;
+
+    ++pe->block->num_used;
+
+    --m_capacity;
+    ++m_size;
+
 }
 
 
