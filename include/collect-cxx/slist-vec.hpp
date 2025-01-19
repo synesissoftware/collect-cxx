@@ -80,13 +80,6 @@ private:
     public: // construction
         block();
 
-    public: // operations
-        void
-        push_first_(
-            value_type const&   value
-        ,   entry*              next
-        );
-
     public: // attributes
         size_type capacity() const noexcept;
         size_type size() const noexcept;
@@ -312,6 +305,10 @@ private: // implementation
     void
     clear_without_dropping_blocks_() noexcept;
 
+    struct block&
+    push_new_initialised_block_();
+
+
 private: // fields
     size_type           m_capacity;     // capacity
     size_type           m_size;         // size
@@ -363,20 +360,6 @@ slist_vec<T_value, T_allocator>::block::block()
 {}
 
 template <typename T_value, typename T_allocator>
-void
-slist_vec<T_value, T_allocator>::block::push_first_(
-    typename slist_vec<T_value, T_allocator>::value_type const& value
-,   typename slist_vec<T_value, T_allocator>::entry*            next
-)
-{
-    assert(0 == num_used);
-    assert(nullptr == entries[0].next);
-
-    entries[0] = { next, this, value };
-    ++num_used;
-}
-
-template <typename T_value, typename T_allocator>
 typename slist_vec<T_value, T_allocator>::size_type
 slist_vec<T_value, T_allocator>::block::capacity() const noexcept
 {
@@ -425,21 +408,14 @@ template <typename T_value, typename T_allocator>
 void
 slist_vec<T_value, T_allocator>::clear_without_dropping_blocks_() noexcept
 {
-    if (empty())
-    {
-        return;
-    }
-
     for (struct entry*& e = bbegin_()->next; end_() != e; )
     {
-        // struct entry* curr = e;
         struct entry* next = e->next;
 
         assert(nullptr != e->next);
         assert(nullptr != e->block);
 
         e->value = value_type();
-        e->block = nullptr;
         e->next = nullptr;
 
         e = next;
@@ -447,6 +423,24 @@ slist_vec<T_value, T_allocator>::clear_without_dropping_blocks_() noexcept
         --m_size;
         ++m_capacity;
     }
+}
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::block&
+slist_vec<T_value, T_allocator>::push_new_initialised_block_()
+{
+    m_block_list.push_back(block());
+
+    struct block& last_block = m_block_list.back();
+
+    for (struct entry& e : last_block.entries)
+    {
+        e.block = &last_block;
+    }
+
+    m_capacity += last_block.capacity();
+
+    return last_block;
 }
 
 
@@ -464,8 +458,8 @@ slist_vec<T_value, T_allocator>::slist_vec()
 
     , m_block_list()
 #endif
-    , m_bbegin({ nullptr, nullptr, value_type() })
-    , m_last(nullptr)
+    , m_bbegin({ end_(), nullptr, value_type() })
+    , m_last(end_())
 {}
 
 template <typename T_value, typename T_allocator>
@@ -480,8 +474,8 @@ slist_vec<T_value, T_allocator>::slist_vec(std::initializer_list<value_type> ili
 
     , m_block_list()
 #endif
-    , m_bbegin({ nullptr, nullptr, value_type() })
-    , m_last(nullptr)
+    , m_bbegin({ end_(), nullptr, value_type() })
+    , m_last(end_())
 {
     for (value_type const& value : ilist)
     {
@@ -494,8 +488,8 @@ slist_vec<T_value, T_allocator>::slist_vec(class_type const& rhs)
     : m_capacity(0)
     , m_size(0)
     , m_block_list()
-    , m_bbegin({ nullptr, nullptr, value_type() })
-    , m_last(nullptr)
+    , m_bbegin({ end_(), nullptr, value_type() })
+    , m_last(end_())
 {
     for (value_type const& value : rhs)
     {
@@ -508,27 +502,10 @@ slist_vec<T_value, T_allocator>::slist_vec(class_type&& rhs)
     : m_capacity()
     , m_size()
     , m_block_list()
-    , m_bbegin()
-    , m_last()
+    , m_bbegin({ end_(), nullptr, value_type() })
+    , m_last(end_())
 {
-    struct entry* const e = rhs.end_();
-
-    std::swap(m_capacity, rhs.m_capacity);
-    std::swap(m_size, rhs.m_size);
-    std::swap(m_block_list, rhs.m_block_list);
-    std::swap(m_bbegin, rhs.m_bbegin);
-    std::swap(m_last, rhs.m_last);
-
-    for (auto& block : m_block_list)
-    {
-        for (auto& entry : block.entries)
-        {
-            if (e == entry.next)
-            {
-                entry.next = end_();
-            }
-        }
-    }
+    swap(rhs);
 }
 
 template <typename T_value, typename T_allocator>
@@ -556,9 +533,7 @@ slist_vec<T_value, T_allocator>::slist_vec::operator =(std::initializer_list<val
 
     while (ilist.size() > capacity())
     {
-        m_block_list.push_back(block());
-
-        m_capacity += m_block_list.back().capacity();
+        push_new_initialised_block_();
     }
 
     // for each item in ilist add into ready block(s)
@@ -616,18 +591,72 @@ template <typename T_value, typename T_allocator>
 void
 slist_vec<T_value, T_allocator>::swap(class_type& rhs) noexcept
 {
-    std::swap(m_capacity, rhs.m_capacity);
-    std::swap(m_size, rhs.m_size);
-#if 0
+    struct entry* const rhs_e   =   rhs.end_();
+    struct entry* const this_e  =   this->end_();
 
-    std::swap(m_active_block_list, rhs.m_active_block_list);
-    std::swap(m_spare_block_list, rhs.m_spare_block_list);
-#else
+
+    // m_capacity is normal
+
+    std::swap(m_capacity, rhs.m_capacity);
+
+
+    // m_size is normal
+
+    std::swap(m_size, rhs.m_size);
+
+
+    // m_block_list is normal, except any `next` fields referring to
+    // `end_()` in either list must be swapped to ensure that they are still
+    // correct within their new containing instance
 
     std::swap(m_block_list, rhs.m_block_list);
-#endif
-    std::swap(m_bbegin.next, rhs.m_bbegin.next);
+
+    for (auto& block : m_block_list)
+    {
+        for (auto& entry : block.entries)
+        {
+            if (rhs_e == entry.next)
+            {
+                entry.next = this_e;
+            }
+        }
+    }
+    for (auto& block : rhs.m_block_list)
+    {
+        for (auto& entry : block.entries)
+        {
+            if (this_e == entry.next)
+            {
+                entry.next = rhs_e;
+            }
+        }
+    }
+
+
+    // m_bbegin is normal, except need to account for `end_()` pointers
+
+    std::swap(m_bbegin, rhs.m_bbegin);
+    if (rhs_e == m_bbegin.next)
+    {
+        m_bbegin.next = this_e;
+    }
+    if (this_e == rhs.m_bbegin.next)
+    {
+        rhs.m_bbegin.next = rhs_e;
+    }
+
+
+    // m_size is normal, except need to account for `end_()` pointers
+
     std::swap(m_last, rhs.m_last);
+    if (rhs_e == m_last)
+    {
+        m_last = this_e;
+    }
+    if (this_e == rhs.m_last)
+    {
+        rhs.m_last = rhs_e;
+    }
 }
 
 
@@ -675,11 +704,6 @@ template <typename T_value, typename T_allocator>
 typename slist_vec<T_value, T_allocator>::const_iterator
 slist_vec<T_value, T_allocator>::cbegin() const
 {
-    if (nullptr == m_bbegin.next)
-    {
-        return cend();
-    }
-
     return const_iterator(m_bbegin.next, end_());
 }
 
@@ -712,7 +736,7 @@ typename slist_vec<T_value, T_allocator>::reference
 slist_vec<T_value, T_allocator>::front() noexcept
 {
     assert(!empty());
-    assert(nullptr != m_bbegin.next);
+    assert(end_() != m_bbegin.next);
 
     return m_bbegin.next->value;
 }
@@ -722,7 +746,7 @@ typename slist_vec<T_value, T_allocator>::const_reference
 slist_vec<T_value, T_allocator>::front() const noexcept
 {
     assert(!empty());
-    assert(nullptr != m_bbegin.next);
+    assert(end_() != m_bbegin.next);
 
     return m_bbegin.next->value;
 }
@@ -732,7 +756,7 @@ typename slist_vec<T_value, T_allocator>::reference
 slist_vec<T_value, T_allocator>::back() noexcept
 {
     assert(!empty());
-    assert(nullptr != m_last);
+    assert(end_() != m_last);
 
     return m_last->value;
 }
@@ -742,7 +766,7 @@ typename slist_vec<T_value, T_allocator>::const_reference
 slist_vec<T_value, T_allocator>::back() const noexcept
 {
     assert(!empty());
-    assert(nullptr != m_last);
+    assert(end_() != m_last);
 
     return m_last->value;
 }
@@ -865,15 +889,9 @@ slist_vec<T_value, T_allocator>::push_back(value_type const& value)
 
     if (0 == capacity())
     {
-        m_block_list.push_back(block());
-
-        struct block& last_block = m_block_list.back();
-
-        m_capacity += last_block.capacity();
+        struct block& last_block = push_new_initialised_block_();
 
         pe = &last_block.entries[0];
-
-        pe->block = &last_block;
     }
     else
     {
