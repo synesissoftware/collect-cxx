@@ -802,6 +802,7 @@ slist_vec<T_value, T_allocator>::erase_after(
         //
         // - "remove" e_next from the list, tying e_ref to e_next->next
         // - "reset" e_next
+        // - adjust last, if affected
         // - adjust the block attributes
         // - adjust the container attributes
 
@@ -812,6 +813,11 @@ slist_vec<T_value, T_allocator>::erase_after(
 
         e_next->value   =   value_type();
         e_next->next    =   nullptr; // this marks the element as unused
+
+        if (m_last == e_next)
+        {
+            m_last = e_ref;
+        }
 
         --b_next->num_used;
 

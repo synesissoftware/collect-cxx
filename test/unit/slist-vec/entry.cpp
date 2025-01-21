@@ -4,7 +4,7 @@
  * Purpose: Unit-tests for `collect_cxx::slist_vec`.
  *
  * Created: 18th January 2025
- * Updated: 19th January 2025
+ * Updated: 22nd January 2025
  *
  * ////////////////////////////////////////////////////////////////////// */
 
@@ -190,6 +190,8 @@ void TEST_ctor_init_list_1()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -202,6 +204,9 @@ void TEST_ctor_init_list_1()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
     }
 }
 
@@ -215,6 +220,8 @@ void TEST_ctor_init_list_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(225, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -227,6 +234,9 @@ void TEST_ctor_init_list_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(225, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
     }
 
     {
@@ -239,6 +249,8 @@ void TEST_ctor_init_list_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(270, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -251,6 +263,9 @@ void TEST_ctor_init_list_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(271, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(1, c.back());
     }
 }
 
@@ -290,6 +305,8 @@ void TEST_ctor_copy_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -303,6 +320,9 @@ void TEST_ctor_copy_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
     }
 }
 
@@ -342,6 +362,8 @@ void TEST_ctor_move_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -355,6 +377,9 @@ void TEST_ctor_move_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
 
 
         TEST_BOOLEAN_TRUE(c0.empty());
@@ -447,6 +472,8 @@ void TEST_swap_2()
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c1.begin(), c1.end(), 0));
 
+        TEST_EQ(0, c1.front());
+
         TEST_BOOLEAN_TRUE(c2.empty());
 
         TEST_EQ(c2.cend(), c2.cbegin());
@@ -466,6 +493,8 @@ void TEST_swap_2()
         TEST_NE(c2.cend(), c2.cbegin());
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c2.begin(), c2.end(), 0));
+
+        TEST_EQ(0, c2.front());
     }
 
     {
@@ -478,6 +507,9 @@ void TEST_swap_2()
         TEST_NE(c1.cend(), c1.cbegin());
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c1.begin(), c1.end(), 0));
+
+        TEST_EQ(0, c1.front());
+        TEST_EQ(9, c1.back());
 
         TEST_BOOLEAN_TRUE(c2.empty());
         TEST_INTEGER_EQUAL(0, c2.size());
@@ -501,6 +533,9 @@ void TEST_swap_2()
         TEST_NE(c2.cend(), c2.cbegin());
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c2.begin(), c2.end(), 0));
+
+        TEST_EQ(0, c2.front());
+        TEST_EQ(9, c2.back());
     }
 }
 
@@ -522,6 +557,8 @@ void TEST_swap_3()
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c2.begin(), c2.end(), 0));
 
+        TEST_EQ(0, c2.front());
+
         c1.swap(c2);
 
         TEST_BOOLEAN_FALSE(c1.empty());
@@ -529,6 +566,8 @@ void TEST_swap_3()
         TEST_NE(c1.cend(), c1.cbegin());
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c1.begin(), c1.end(), 0));
+
+        TEST_EQ(0, c1.front());
 
         TEST_BOOLEAN_TRUE(c2.empty());
 
@@ -555,6 +594,9 @@ void TEST_swap_3()
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c2.begin(), c2.end(), 0));
 
+        TEST_EQ(0, c2.front());
+        TEST_EQ(9, c2.back());
+
         c1.swap(c2);
 
         TEST_BOOLEAN_FALSE(c1.empty());
@@ -563,6 +605,9 @@ void TEST_swap_3()
         TEST_NE(c1.cend(), c1.cbegin());
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c1.begin(), c1.end(), 0));
+
+        TEST_EQ(0, c1.front());
+        TEST_EQ(9, c1.back());
 
         TEST_BOOLEAN_TRUE(c2.empty());
         TEST_INTEGER_EQUAL(0, c2.size());
@@ -585,11 +630,15 @@ void TEST_swap_4()
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(1368, std::accumulate(c1.begin(), c1.end(), 0));
 
+        TEST_EQ(123, c1.front());
+
         TEST_BOOLEAN_FALSE(c2.empty());
 
         TEST_NE(c2.cend(), c2.cbegin());
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c2.begin(), c2.end(), 0));
+
+        TEST_EQ(0, c2.front());
 
         c1.swap(c2);
 
@@ -599,11 +648,15 @@ void TEST_swap_4()
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c1.begin(), c1.end(), 0));
 
+        TEST_EQ(0, c1.front());
+
         TEST_BOOLEAN_FALSE(c2.empty());
 
         TEST_NE(c2.cend(), c2.cbegin());
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(1368, std::accumulate(c2.begin(), c2.end(), 0));
+
+        TEST_EQ(123, c2.front());
     }
 
     {
@@ -617,12 +670,18 @@ void TEST_swap_4()
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(1368, std::accumulate(c1.begin(), c1.end(), 0));
 
+        TEST_EQ(123, c1.front());
+        TEST_EQ(789, c1.back());
+
         TEST_BOOLEAN_FALSE(c2.empty());
         TEST_INTEGER_EQUAL(10, c2.size());
 
         TEST_NE(c2.cend(), c2.cbegin());
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c2.begin(), c2.end(), 0));
+
+        TEST_EQ(0, c2.front());
+        TEST_EQ(9, c2.back());
 
         c1.swap(c2);
 
@@ -633,12 +692,18 @@ void TEST_swap_4()
         TEST_NE(c1.end(), c1.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c1.begin(), c1.end(), 0));
 
+        TEST_EQ(0, c1.front());
+        TEST_EQ(9, c1.back());
+
         TEST_BOOLEAN_FALSE(c2.empty());
         TEST_INTEGER_EQUAL(3, c2.size());
 
         TEST_NE(c2.cend(), c2.cbegin());
         TEST_NE(c2.end(), c2.begin());
         TEST_INTEGER_EQUAL(1368, std::accumulate(c2.begin(), c2.end(), 0));
+
+        TEST_EQ(123, c2.front());
+        TEST_EQ(789, c2.back());
     }
 }
 
@@ -717,6 +782,8 @@ void TEST_assign_copy_3()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -732,6 +799,9 @@ void TEST_assign_copy_3()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
     }
 }
 
@@ -748,6 +818,8 @@ void TEST_assign_copy_4()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -763,6 +835,9 @@ void TEST_assign_copy_4()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
     }
 }
 
@@ -780,6 +855,8 @@ void TEST_clear_THEN_assign_1()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
     }
 
     {
@@ -796,34 +873,28 @@ void TEST_clear_THEN_assign_1()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
     }
 }
 
 void TEST_erase_after_p_1()
 {
-    // std::forward_list<int>
-    {
-        {
-            std::forward_list<int>  c;
-
-            // each of the following is UB
-
-            // c.erase_after(c.before_begin());
-            // c.erase_after(c.begin());
-        }
-
-    }
-
     {
         std::forward_list<int>      c = { 1234, 6789 };
 
         TEST_BOOLEAN_FALSE(c.empty());
         TEST_INTEGER_EQUAL(8023, std::accumulate(c.begin(), c.end(), 0));
 
+        TEST_EQ(1234, c.front());
+
         auto i = c.erase_after(c.begin());
 
         TEST_BOOLEAN_FALSE(c.empty());
         TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(1234, c.front());
 
         TEST_EQ(c.end(), i);
 
@@ -834,6 +905,11 @@ void TEST_erase_after_p_1()
         TEST_BOOLEAN_FALSE(c.empty());
         TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
 #endif
+
+        c.erase_after(c.before_begin());
+
+        TEST_BOOLEAN_TRUE(c.empty());
+        TEST_INTEGER_EQUAL(0, std::accumulate(c.begin(), c.end(), 0));
     }
 
     {
@@ -844,12 +920,8 @@ void TEST_erase_after_p_1()
         TEST_INTEGER_EQUAL(2, c.size());
         TEST_INTEGER_EQUAL(8023, std::accumulate(c.begin(), c.end(), 0));
 
-        c.erase_after(c.begin());
-
-        TEST_INTEGER_EQUAL(30, c.capacity());
-        TEST_BOOLEAN_FALSE(c.empty());
-        TEST_INTEGER_EQUAL(1, c.size());
-        TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+        TEST_EQ(1234, c.front());
+        TEST_EQ(6789, c.back());
 
         c.erase_after(c.begin());
 
@@ -857,6 +929,26 @@ void TEST_erase_after_p_1()
         TEST_BOOLEAN_FALSE(c.empty());
         TEST_INTEGER_EQUAL(1, c.size());
         TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(1234, c.front());
+        TEST_EQ(1234, c.back());
+
+        c.erase_after(c.begin());
+
+        TEST_INTEGER_EQUAL(30, c.capacity());
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(1, c.size());
+        TEST_INTEGER_EQUAL(1234, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(1234, c.front());
+        TEST_EQ(1234, c.back());
+
+        c.erase_after(c.before_begin());
+
+        TEST_INTEGER_EQUAL(31, c.capacity());
+        TEST_BOOLEAN_TRUE(c.empty());
+        TEST_INTEGER_EQUAL(0, c.size());
+        TEST_INTEGER_EQUAL(0, std::accumulate(c.begin(), c.end(), 0));
     }
 }
 
@@ -864,6 +956,10 @@ void TEST_erase_after_p_2()
 {
     {
         std::forward_list<int>      c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+/*
+                                                   ^
+                                          0, 1, 2, 3,    5, 6, 7, 8, 9
+*/
 
         auto i3 = call_next(c.begin(), 3);
 
@@ -877,10 +973,16 @@ void TEST_erase_after_p_2()
 
         TEST_NE(c.end(), i);
         TEST_INTEGER_EQUAL(5, *i);
+
+        TEST_EQ(0, c.front());
     }
 
     {
         collect_cxx::slist_vec<int> c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+/*
+                                                   ^
+                                          0, 1, 2, 3,    5, 6, 7, 8, 9
+*/
 
         TEST_INTEGER_EQUAL(21, c.capacity());
         TEST_BOOLEAN_FALSE(c.empty());
@@ -898,6 +1000,9 @@ void TEST_erase_after_p_2()
         TEST_NE(c.cend(), c.cbegin());
         TEST_NE(c.end(), c.begin());
         TEST_INTEGER_EQUAL(41, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
     }
 }
 
@@ -912,6 +1017,9 @@ void TEST_erase_after_fl_2()
         std::forward_list<int>      c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 /*
                                                 ^              ^
+                                          0, 1, 2,             7, 8, 9
+
+                                       ^                                ^
                                           0, 1, 2,             7, 8, 9
 */
 
@@ -928,6 +1036,8 @@ void TEST_erase_after_fl_2()
 
         TEST_NE(c.end(), i);
         TEST_INTEGER_EQUAL(7, *i);
+
+        TEST_INTEGER_EQUAL(0, c.front());
 
 
         auto ib = call_next(c.before_begin(), 0);
@@ -950,6 +1060,9 @@ void TEST_erase_after_fl_2()
 /*
                                                 ^              ^
                                           0, 1, 2,             7, 8, 9
+
+                                       ^                                ^
+                                          0, 1, 2,             7, 8, 9
 */
 
         auto i2 = call_next(c.begin(), 2);
@@ -965,6 +1078,9 @@ void TEST_erase_after_fl_2()
 
         // TEST_NE(c.end(), i);
         // TEST_INTEGER_EQUAL(7, *i);
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
 
         auto ib = call_next(c.before_begin(), 0);
         auto i6 = call_next(c.begin(), 6);
