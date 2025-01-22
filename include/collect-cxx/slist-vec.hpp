@@ -236,6 +236,8 @@ public: // modifiers
     void push_back(value_type const& value);
     void push_back(value_type&& value);
 
+    size_type unique() noexcept;
+
 
 public: // iteration
     /// Returns a pseudo-iterator to the element before the first element in
@@ -947,6 +949,80 @@ slist_vec<T_value, T_allocator>::push_back(value_type const& value)
 
 }
 
+
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::size_type
+slist_vec<T_value, T_allocator>::unique() noexcept
+{
+    size_type           num_removed =   0;
+    value_type const*   prev        =   nullptr;
+
+/*
+    | B | b                                                               l | e
+        | 2 | 2 | 5 | 0 | 1 | 3 | 4 | 5 | 6 | 8 | 9 | 7 | 7 | 7 | 7 | 7 | 7 |
+
+    | B | b                   l | e
+        | 7 | 7 | 7 | 7 | 7 | 7 |
+
+    | B | b   l | e
+        | 7 | 7 |
+
+    | B | b/l | e
+        | 7   |
+
+    | B | b/l/e
+        |
+*/
+
+    for (struct entry* e = bbegin_(); end_() != e->next; )
+    {
+        struct entry* curr = e->next;
+
+        assert(nullptr != curr->block);
+
+        if (nullptr != prev && *prev == curr->value)
+        {
+
+            // found a duplicate, so we skip out the _subsequent_ (i.e. `curr` element)
+
+            struct block* blk   =   e->block;
+            struct entry* next  =   curr->next;
+
+            curr->next = nullptr;
+#if 0
+
+            ~curr->value();
+#else
+
+            curr->value = value_type();
+#endif
+
+            e->next = next;
+
+            if (0 == --blk->num_used)
+            {
+                // TODO: free / move to spare list
+            }
+
+            if (m_last == curr)
+            {
+                m_last = e;
+            }
+
+            --m_size;
+            ++m_capacity;
+
+            ++num_removed;
+        }
+        else
+        {
+            prev = &curr->value;
+
+            e = curr;
+        }
+
+    return num_removed;
+}
 
 } /* namespace collect_cxx */
 

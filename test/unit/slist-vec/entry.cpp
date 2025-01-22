@@ -69,6 +69,13 @@ namespace
     void TEST_erase_after_fl_1();
     void TEST_erase_after_fl_2();
     void TEST_erase_after_fl_3();
+
+    void TEST_unique_1();
+    void TEST_unique_2();
+    void TEST_unique_3();
+    void TEST_unique_4();
+    void TEST_unique_5();
+    void TEST_unique_6();
 } // anonymous namespace
 
 
@@ -140,6 +147,13 @@ int main(int argc, char *argv[])
         XTESTS_RUN_CASE(TEST_erase_after_fl_1);
         XTESTS_RUN_CASE(TEST_erase_after_fl_2);
         XTESTS_RUN_CASE(TEST_erase_after_fl_3);
+
+        XTESTS_RUN_CASE(TEST_unique_1);
+        XTESTS_RUN_CASE(TEST_unique_2);
+        XTESTS_RUN_CASE(TEST_unique_3);
+        XTESTS_RUN_CASE(TEST_unique_4);
+        XTESTS_RUN_CASE(TEST_unique_5);
+        XTESTS_RUN_CASE(TEST_unique_6);
 
         XTESTS_PRINT_RESULTS();
 
@@ -1426,6 +1440,248 @@ void TEST_erase_after_fl_3()
         TEST_EQ(c.end(), c.begin());
         TEST_INTEGER_EQUAL(0, std::accumulate(c.begin(), c.end(), 0));
     }
+}
+
+void TEST_unique_1()
+{
+    {
+        std::forward_list<int>      c;
+
+        TEST_BOOLEAN_TRUE(c.empty());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(0, r);
+#else
+
+        c.unique();
+#endif
+
+        TEST_BOOLEAN_TRUE(c.empty());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c;
+
+        TEST_BOOLEAN_TRUE(c.empty());
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(0, r);
+
+        TEST_BOOLEAN_TRUE(c.empty());
+    }
+}
+
+void TEST_unique_2()
+{
+
+    {
+        collect_cxx::slist_vec<int> c = { 7, 7 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(2, c.size());
+
+        TEST_INTEGER_EQUAL(14, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(7, c.front());
+        TEST_EQ(7, c.back());
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(1, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(1, c.size());
+
+        TEST_INTEGER_EQUAL(7, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(7, c.front());
+        TEST_EQ(7, c.back());
+    }
+}
+
+void TEST_unique_3()
+{
+
+    {
+        collect_cxx::slist_vec<int> c = { 7, 7, 7, 7, 7, 7 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(42, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(7, c.front());
+        TEST_EQ(7, c.back());
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(5, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+        TEST_INTEGER_EQUAL(1, c.size());
+
+        TEST_INTEGER_EQUAL(7, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(7, c.front());
+        TEST_EQ(7, c.back());
+    }
+}
+
+void TEST_unique_4()
+{
+    {
+        std::forward_list<int>      c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(0, r);
+#else
+
+        c.unique();
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(0, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(45, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
+    }
+}
+
+void TEST_unique_5()
+{
+    {
+        std::forward_list<int>      c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(6, r);
+#else
+
+        c.unique();
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(50, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(6, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(50, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+    }
+}
+
+void TEST_unique_6()
+{
+    {
+        std::forward_list<int>      c = { 2, 2, 5, 0, 1, 3, 4, 5, 6, 8, 9, 7, 7, 7, 7, 7, 7 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(2, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(6, r);
+#else
+
+        c.unique();
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(50, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(2, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 2, 2, 5, 0, 1, 3, 4, 5, 6, 8, 9, 7, 7, 7, 7, 7, 7 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(2, c.front());
+        TEST_EQ(7, c.back());
+
+        auto r = c.unique();
+
+        TEST_INTEGER_EQUAL(6, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(50, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(2, c.front());
+        TEST_INTEGER_EQUAL(7, c.back());
+    }
+
 }
 } // anonymous namespace
 
