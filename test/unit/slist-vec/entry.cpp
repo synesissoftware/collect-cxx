@@ -76,6 +76,9 @@ namespace
     void TEST_unique_4();
     void TEST_unique_5();
     void TEST_unique_6();
+
+    void TEST_remove_1();
+    void TEST_remove_2();
 } // anonymous namespace
 
 
@@ -154,6 +157,9 @@ int main(int argc, char *argv[])
         XTESTS_RUN_CASE(TEST_unique_4);
         XTESTS_RUN_CASE(TEST_unique_5);
         XTESTS_RUN_CASE(TEST_unique_6);
+
+        XTESTS_RUN_CASE(TEST_remove_1);
+        XTESTS_RUN_CASE(TEST_remove_2);
 
         XTESTS_PRINT_RESULTS();
 
@@ -1681,7 +1687,108 @@ void TEST_unique_6()
         TEST_EQ(2, c.front());
         TEST_INTEGER_EQUAL(7, c.back());
     }
+}
 
+void TEST_remove_1()
+{
+    {
+        std::forward_list<int>      c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.remove(-5);
+
+        TEST_INTEGER_EQUAL(0, r);
+#else
+
+        c.remove(-5);
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+
+        auto r = c.remove(-5);
+
+        TEST_INTEGER_EQUAL(0, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+    }
+}
+
+void TEST_remove_2()
+{
+    {
+        std::forward_list<int>      c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.remove(5);
+
+        TEST_INTEGER_EQUAL(2, r);
+#else
+
+        c.remove(5);
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(77, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+
+        auto r = c.remove(5);
+
+        TEST_INTEGER_EQUAL(2, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(77, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
+    }
 }
 } // anonymous namespace
 

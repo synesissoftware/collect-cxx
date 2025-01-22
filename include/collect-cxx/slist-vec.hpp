@@ -236,6 +236,8 @@ public: // modifiers
     void push_back(value_type const& value);
     void push_back(value_type&& value);
 
+    size_type remove(value_type const& value) noexcept;
+
     size_type unique() noexcept;
 
 
@@ -949,6 +951,59 @@ slist_vec<T_value, T_allocator>::push_back(value_type const& value)
 
 }
 
+template <typename T_value, typename T_allocator>
+typename slist_vec<T_value, T_allocator>::size_type
+slist_vec<T_value, T_allocator>::remove(value_type const& value) noexcept
+{
+    size_type num_removed = 0;
+
+    for (struct entry* e = bbegin_(); end_() != e->next; )
+    {
+        struct entry* curr = e->next;
+
+        assert(nullptr != curr->block);
+
+        if (value == curr->value)
+        {
+            // found a duplicate, so we skip out the _subsequent_ (i.e. `curr` element)
+
+            struct block* blk   =   curr->block;
+            struct entry* next  =   curr->next;
+
+            curr->next = nullptr;
+#if 0
+
+            ~curr->value();
+#else
+
+            curr->value = value_type();
+#endif
+
+            e->next = next;
+
+            if (0 == --blk->num_used)
+            {
+                // TODO: free / move to spare list
+            }
+
+            if (m_last == curr)
+            {
+                m_last = e;
+            }
+
+            --m_size;
+            ++m_capacity;
+
+            ++num_removed;
+        }
+        else
+        {
+            e = curr;
+        }
+    }
+
+    return num_removed;
+}
 
 template <typename T_value, typename T_allocator>
 typename slist_vec<T_value, T_allocator>::size_type
