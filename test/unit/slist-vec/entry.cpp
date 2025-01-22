@@ -79,6 +79,10 @@ namespace
 
     void TEST_remove_1();
     void TEST_remove_2();
+
+    void TEST_remove_if_0();
+    void TEST_remove_if_1();
+    void TEST_remove_if_2();
 } // anonymous namespace
 
 
@@ -160,6 +164,10 @@ int main(int argc, char *argv[])
 
         XTESTS_RUN_CASE(TEST_remove_1);
         XTESTS_RUN_CASE(TEST_remove_2);
+
+        XTESTS_RUN_CASE(TEST_remove_if_0);
+        XTESTS_RUN_CASE(TEST_remove_if_1);
+        XTESTS_RUN_CASE(TEST_remove_if_2);
 
         XTESTS_PRINT_RESULTS();
 
@@ -1787,6 +1795,189 @@ void TEST_remove_2()
         TEST_INTEGER_EQUAL(77, std::accumulate(c.begin(), c.end(), 0));
 
         TEST_EQ(0, c.front());
+        TEST_EQ(9, c.back());
+    }
+}
+
+void TEST_remove_if_0()
+{
+    {
+        std::forward_list<int>      c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.remove_if([] (int const& value) {
+            return -5 == value;
+        });
+
+        TEST_INTEGER_EQUAL(0, r);
+#else
+
+        c.remove_if([] (int const& value) {
+            return -5 == value;
+        });
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+
+        auto r = c.remove_if([] (int const& value) {
+            return -5 == value;
+        });
+
+        TEST_INTEGER_EQUAL(0, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+    }
+}
+
+void TEST_remove_if_1()
+{
+    {
+        std::forward_list<int>      c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+/*
+                                             +     +  +     +     +                    +
+*/
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.remove_if([] (int const& value) {
+            return 0 != (value % 2);
+        });
+
+        TEST_INTEGER_EQUAL(11, r);
+#else
+
+        c.remove_if([] (int const& value) {
+            return 0 != (value % 2);
+        });
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(22, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+/*
+                                             +     +  +     +     +                    +
+*/
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+
+        auto r = c.remove_if([] (int const& value) {
+            return 0 != (value % 2);
+        });
+
+        TEST_INTEGER_EQUAL(11, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(22, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(0, c.front());
+        TEST_EQ(8, c.back());
+    }
+}
+
+void TEST_remove_if_2()
+{
+    {
+        std::forward_list<int>      c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+/*
+                                          +     +        +     +     +  +  +  +  +  +     +
+*/
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+
+#if __cplusplus >= 202002L
+
+        auto r = c.remove_if([] (int const& value) {
+            return 0 == (value % 2);
+        });
+
+        TEST_INTEGER_EQUAL(6, r);
+#else
+
+        c.remove_if([] (int const& value) {
+            return 0 == (value % 2);
+        });
+#endif
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(65, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+    }
+
+    {
+        collect_cxx::slist_vec<int> c = { 5, 0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 8, 9 };
+/*
+                                          +     +        +     +     +  +  +  +  +  +     +
+*/
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(87, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
+        TEST_EQ(9, c.back());
+
+        auto r = c.remove_if([] (int const& value) {
+            return 0 == (value % 2);
+        });
+
+        TEST_INTEGER_EQUAL(6, r);
+
+        TEST_BOOLEAN_FALSE(c.empty());
+
+        TEST_INTEGER_EQUAL(65, std::accumulate(c.begin(), c.end(), 0));
+
+        TEST_EQ(5, c.front());
         TEST_EQ(9, c.back());
     }
 }
