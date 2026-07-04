@@ -5,6 +5,7 @@
 
 - [Functional improvements](#functional-improvements)
 - [Performance improvements](#performance-improvements)
+- [Packaging improvements](#packaging-improvements)
 
 
 ## Functional improvements
@@ -13,6 +14,11 @@
 
 
 ## Performance improvements
+
+* \<none>
+
+
+## Packaging improvements
 
 * \<none>
 
