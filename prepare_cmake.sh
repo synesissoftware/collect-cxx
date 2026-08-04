@@ -52,9 +52,8 @@ while [[ $# -gt 0 ]]; do
       ;;
     --help)
 
+      [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-collect-cxx Special and custom Collections and Containers (for Rust)
-Copyright (c) 2025, Matthew Wilson and Synesis Information Systems
 Creates/reinitialises the CMake build script(s)
 
 $ScriptPath [ ... flags/options ... ]
