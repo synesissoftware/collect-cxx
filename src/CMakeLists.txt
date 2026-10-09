@@ -5,7 +5,7 @@
 # Purpose:  CMake lists file for collect-cxx library
 #
 # Created:  ...
-# Updated:  17th January 2025
+# Updated:  10th October 2026
 #
 # ######################################################################## #
 
@@ -30,16 +30,6 @@ if(WIN32)
 		add_definitions(-DWIN32)
 	endif()
 endif(WIN32)
-
-if((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
-
-	target_compile_definitions(core
-		PRIVATE
-			"/Zc:__cplusplus"
-	)
-
-	add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
-endif()
 
 
 set(CORE_SRCS
@@ -86,6 +76,21 @@ target_compile_options(core
 			/WX /W4
 		>
 )
+
+# Must follow add_library(core): target_* commands require the target to
+# exist. /Zc:__cplusplus is a compile option, not a compile definition.
+if((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
+
+	target_compile_options(core
+		PRIVATE
+			/Zc:__cplusplus
+	)
+
+	target_compile_definitions(core
+		PRIVATE
+			_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+	)
+endif()
 
 
 # ##########################################################
