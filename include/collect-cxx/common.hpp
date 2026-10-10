@@ -3,7 +3,7 @@
 #define COLLECT_CXX_VER_MAJOR       0
 #define COLLECT_CXX_VER_MINOR       0
 #define COLLECT_CXX_VER_PATCH       0
-#define COLLECT_CXX_VER_ALPHABETA   1
+#define COLLECT_CXX_VER_ALPHABETA   0xFF
 
 #define COLLECT_CXX_VER \
     (0\

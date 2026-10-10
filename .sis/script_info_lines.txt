@@ -1,2 +1,2 @@
-collect-cxx Special and custom Collections and Containers (for Rust)
+collect-cxx Special and custom Collections and Containers (for C++)
 Copyright (c) 2025-2026, Matthew Wilson and Synesis Information Systems
