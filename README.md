@@ -13,7 +13,9 @@ Special and custom Collections and Containers, for C++
 ## Table of Contents <!-- omit in toc -->
 
 - [Introduction](#introduction)
+- [Developer Experience](#developer-experience)
 - [Installation](#installation)
+  - [API documentation (Doxygen)](#api-documentation-doxygen)
 - [Components](#components)
 - [Examples](#examples)
 - [Project Information](#project-information)
@@ -29,10 +31,50 @@ Special and custom Collections and Containers, for C++
 T.B.C.
 
 
+## Developer Experience
+
+The **C++** core needs _no non-standard dependencies_ for application use,
+so just:
+
+```bash
+./prepare_cmake.sh -m -v -E -T
+./run_all_unit_tests.sh
+```
+
+For a full tree (examples and tests), install via CMake:
+* [**BDUT**](https://github.com/synesissoftware/BDUT);
+* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism);
+* [**STLSoft**](https://github.com/synesissoftware/STLSoft);
+
+then:
+
+```bash
+./prepare_cmake.sh -m -v
+./run_all_automated_tests.sh
+```
+
+Try **test/scratch/versions** (`test.scratch.versions`) or a unit suite under
+**test/unit/**. Full options: [INSTALL.md](./INSTALL.md);
+`./prepare_cmake.sh --help`.
+
+
 ## Installation
 
 See **[INSTALL.md](./INSTALL.md)** for **CMake** / **prepare_cmake.sh**
 build and install steps.
+
+
+### API documentation (Doxygen)
+
+HTML API reference for the public headers may be generated locally:
+
+```bash
+./generate_doxygen.sh
+```
+
+Open `_build/doxygen/html/index.html` in a browser (or
+`<build-dir>/doxygen/html/index.html` when `SIS_CMAKE_BUILD_DIR` is set).
+Requires [Doxygen](https://www.doxygen.nl/) on `PATH`.
 
 
 ## Components

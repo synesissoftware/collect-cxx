@@ -5,18 +5,18 @@
 # Purpose:  CMake lists file for collect-cxx library
 #
 # Created:  ...
-# Updated:  10th October 2026
+# Updated:  16th October 2026
 #
 # ######################################################################## #
 
 
-if(UNIX)
+if(_BUILD_AS_UNIX)
 
 	add_definitions(-DUNIX)
 	add_definitions(-Dunix)
-endif(UNIX)
+endif(_BUILD_AS_UNIX)
 
-if(WIN32)
+if(_BUILD_AS_WIN32)
 
 	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 
@@ -29,7 +29,14 @@ if(WIN32)
 
 		add_definitions(-DWIN32)
 	endif()
-endif(WIN32)
+endif(_BUILD_AS_WIN32)
+
+if((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
+
+	add_compile_options("/Zc:__cplusplus")
+
+	add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
+endif()
 
 
 set(CORE_SRCS
