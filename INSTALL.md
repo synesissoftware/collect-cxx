@@ -13,6 +13,7 @@ project's tests (and example programs, when present) additionally requires
 ## Table of Contents <!-- omit in toc -->
 
 - [CMake](#cmake)
+- [Bundled](#bundled)
 
 
 ## CMake
@@ -46,14 +47,48 @@ The primary choice for installation is by use of **CMake**.
    $ ./prepare_cmake.sh -v
    ```
 
-3. Build and install:
+   Useful optional flags:
+
+   * `--disable-examples` / `-E` — omit examples (`BUILD_EXAMPLES=OFF`);
+   * `--disable-testing` / `-T` — omit tests (`BUILD_TESTING=OFF`);
+   * `--stlsoft-root-dir` / `-s` — pass an **STLSoft** source-tree root when
+     it is not available as an installed **CMake** package;
+
+   (**Hint**: execute `$ ./prepare_cmake.sh --help` for more information.)
+
+3. Run a build of the generated **CMake**-derived build files via the
+   **build_cmake.sh** script, as in:
 
    ```bash
    $ ./build_cmake.sh
-   $ cmake --install ./_build --prefix ~/sis
    ```
 
-See **README.md** for project overview and CI status.
+   (**NOTE**: if you provide the flag `--run-make` (=== `-m`) in step 2 then
+   you do not need this step.)
+
+4. As a check (when testing was not disabled), execute the built unit-test
+   programs via **run_all_unit_tests.sh**, as in:
+
+   ```bash
+   $ ./run_all_unit_tests.sh
+   ```
+
+5. Install (optional), for example:
+
+   ```bash
+   $ cmake --install _build --prefix ~/sis
+   ```
+
+   Consumers then use `find_package(collect-cxx REQUIRED)` and link
+   `collect-cxx::core`.
+
+
+## Bundled
+
+As with other Synesis C++ libraries, **collect-cxx** may be vendored by
+copying **include/collect-cxx** and the **src** implementation files into a
+dependent tree and compiling them as part of that project. Prefer the
+**CMake** package when integrating multiple Synesis libraries.
 
 
 <!-- ########################### end of file ########################### -->

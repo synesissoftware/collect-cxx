@@ -5,7 +5,7 @@
 # Purpose:  CMake module file (for BuildType)
 #
 # Created:  16th October 2019
-# Updated:  25th December 2023
+# Updated:  10th September 2026
 #
 # ######################################################################## #
 
@@ -36,8 +36,10 @@ include(BuildType)
 
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+
     set(DEFAULT_BUILD_TYPE "Debug")
 else()
+
     set(DEFAULT_BUILD_TYPE "Release")
 endif()
 
@@ -45,7 +47,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
     message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
 
-    set(CACHE CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}"
+    set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE
         STRING "Choose the type of build." FORCE
     )
 
@@ -54,6 +56,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         "Debug" "Release" "MinSizeRel" "RelWithDebInfo"
     )
 endif()
+
 
 # ############################## end of file ############################# #
 

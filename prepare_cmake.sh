@@ -36,7 +36,6 @@ MinGW=$(sis_cmake_is_truey "${SIS_CMAKE_MINGW:-}" && echo 1 || echo 0)
 MSVC_MT=0
 RunMake=0
 SisUseColours=0
-STLSoftDirGiven=
 TestingDisabled=0
 VerboseMakefile=0
 
@@ -47,6 +46,7 @@ VerboseMakefile=0
 # --no-shwild). The common body below must stay aligned with
 # misc-dev-scripts/shell-scripts/cmake-helpers/prepare_cmake.sh.
 
+STLSoftDirGiven=
 
 # ##########################################################
 # colours
@@ -211,13 +211,16 @@ Flags/options:
 
     -T
     --disable-testing
-        disables building of tests (BUILD_TESTING=OFF)
+        disables building of tests (by setting BUILD_TESTING=OFF). Unless
+        testing is disabled the STLSoft, Diagnosticism, and BDUT libraries
+        will be required to be available to CMake
 
     --mingw
         uses explicitly the "MinGW Makefiles" generator
 
     --msvc-mt
-        when using Visual C++ (MSVC), select the static runtime library
+        when using Visual C++ (MSVC), the static runtime library will be
+        selected; the default is the dynamic runtime library
 
     -m
     --run-make
@@ -226,8 +229,8 @@ Flags/options:
     -s <dir>
     --stlsoft-root-dir <dir>
         specifies the STLSoft root-directory, which will be passed to CMake
-        as the variable STLSOFT, and which overrides the environment
-        variable STLSOFT
+        as the variable STLSOFT, and which will override the environment
+        variable STLSOFT (if present)
 
 
     standard flags:
@@ -264,7 +267,7 @@ if [ $ExamplesDisabled -eq 0 ]; then CMakeBuildExamplesFlag="ON" ; else CMakeBui
 if [ $MSVC_MT -eq 0 ]; then CMakeMsvcMtFlag="OFF" ; else CMakeMsvcMtFlag="ON" ; fi
 if [ $TestingDisabled -eq 0 ]; then CMakeBuildTestingFlag="ON" ; else CMakeBuildTestingFlag="OFF" ; fi
 if [ $VerboseMakefile -eq 0 ]; then CMakeVerboseMakefileFlag="OFF" ; else CMakeVerboseMakefileFlag="ON" ; fi
-if [ -z "$STLSoftDirGiven" ]; then CMakeSTLSoftVariable="" ; else CMakeSTLSoftVariable="-DSTLSOFT=$STLSoftDirGiven/" ; fi
+if [ -n "$STLSoftDirGiven" ]; then CMakeSTLSoftArg="-DSTLSOFT=$STLSoftDirGiven/" ; else CMakeSTLSoftArg="" ; fi
 
 # NOTE: the generator is the *only* thing that may differ between the MinGW
 # and the default paths; every -D option is passed in both cases, so that no
@@ -289,7 +292,7 @@ cmake \
   -DCMAKE_BUILD_TYPE=$Configuration \
   -DCMAKE_VERBOSE_MAKEFILE:BOOL=$CMakeVerboseMakefileFlag \
   -DMSVC_USE_MT:BOOL=$CMakeMsvcMtFlag \
-  $CMakeSTLSoftVariable \
+  $CMakeSTLSoftArg \
   "${CMakeGeneratorArgs[@]}" \
   -B "$CMakeDir" \
   -S "$Dir" \
