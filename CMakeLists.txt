@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for collect-cxx
 #
 # Created:  16th January 2025
-# Updated:  16th October 2026
+# Updated:  27th October 2026
 #
 # ######################################################################## #
 
@@ -186,6 +186,11 @@ if(BUILD_EXAMPLES OR BUILD_TESTING)
 	find_package(Diagnosticism ${Diagnosticism_REQUIRED_VERSION_} REQUIRED)
 
 	message("-- CMake package Diagnosticism found (version ${Diagnosticism_VERSION}; ${Diagnosticism_REQUIRED_VERSION_} requested)")
+
+	add_compile_definitions(
+		HAS_Diagnosticism
+		HAS_DIAGNOSTICISM
+	)
 endif()
 
 
@@ -199,6 +204,8 @@ if(BUILD_TESTING)
 	find_package(BDUT ${BDUT_REQUIRED_VERSION_} REQUIRED)
 
 	message("-- CMake package BDUT found (version ${BDUT_VERSION}; ${BDUT_REQUIRED_VERSION_} requested)")
+
+	add_compile_definitions(HAS_BDUT)
 endif(BUILD_TESTING)
 
 

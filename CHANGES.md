@@ -1,6 +1,11 @@
 # collect-cxx - Changes <!-- omit in toc -->
 
 
+## 0.0.2 - 27th October 2026
+
+* Defined `HAS_Diagnosticism` / `HAS_DIAGNOSTICISM` and `HAS_BDUT` when those packages are detected;
+
+
 ## 0.0.1 - 16th October 2026
 
 * Migrated `COLLECT_CXX_VER_*` from `COLLECT_CXX_VER_ALPHABETA` to `COLLECT_CXX_VER_RELSTATUS`, with a documentation-skip alias for the prior name;
