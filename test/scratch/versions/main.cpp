@@ -17,6 +17,7 @@
 
 #ifdef HAS_Diagnosticism
 # include <diagnosticism/diagnosticism.h>
+# include <diagnosticism/version_string.h>
 #endif
 
 #ifdef HAS_STLSoft
@@ -42,6 +43,43 @@ version(
 ,   T_integer   libver
 )
 {
+#ifdef HAS_Diagnosticism
+
+    char        buffer[101];
+    size_t      n;
+    int const   r = diagnosticism_calc_version_string(
+        buffer
+    ,   sizeof(buffer) / sizeof(buffer[0])
+    ,   (int)((libver >> 24) & 0xff)
+    ,   (int)((libver >> 16) & 0xff)
+    ,   (int)((libver >> 8) & 0xff)
+    ,   (int)((libver >> 0) & 0xff)
+    ,   &n
+    );
+
+    if (0 == r)
+    {
+        buffer[n] = '\0';
+
+        stm
+            << prefix
+            << libname
+            << ": "
+            << buffer
+            << " ("
+            << macroname
+            << " = 0x"
+            << std::hex << std::setfill('0') << std::setw(8)
+            << static_cast<unsigned>(libver)
+            << std::dec
+            << ")"
+            << std::endl
+            ;
+
+        return;
+    }
+#endif /* HAS_Diagnosticism */
+
     stm
         << prefix
         << libname
