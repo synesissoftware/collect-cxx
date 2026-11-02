@@ -7,7 +7,7 @@ the library (the **CMake** target is `collect-cxx::core`).
 
 The public **C++** API has no non-standard dependencies. Building the
 project's tests (and example programs, when present) additionally requires
-**STLSoft**, **Diagnosticism**, and **BDUT**.
+**STLSoft** **1.11.5**+, **Diagnosticism** **0.4.3**+, and **BDUT** **0.5.1**+.
 
 
 ## Table of Contents <!-- omit in toc -->
@@ -38,8 +38,8 @@ The primary choice for installation is by use of **CMake**.
    $ ./prepare_cmake.sh --disable-examples --disable-testing -v
    ```
 
-   For a full build including tests, install **STLSoft** 1.11+,
-   **Diagnosticism**, and **BDUT** via their own **CMake** scripts first,
+   For a full build including tests, install **STLSoft** 1.11.5+,
+   **Diagnosticism** **0.4.3**+, and **BDUT** **0.5.1**+ via their own **CMake** scripts first,
    then:
 
    ```bash

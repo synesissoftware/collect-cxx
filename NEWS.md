@@ -3,6 +3,7 @@
 
 | Date                | News Item                   | Details                                          |
 | ------------------- | --------------------------- | ------------------------------------------------ |
+| 2nd November 2026   | Release of [collect-cxx 0.0.3](https://github.com/synesissoftware/collect-cxx/releases/tag/0.0.3) | **BDUT** **0.5.1**; **Diagnosticism** **0.4.3**; **STLSoft** **1.11.5** |
 | 27th October 2026   | Release of [collect-cxx 0.0.2](https://github.com/synesissoftware/collect-cxx/releases/tag/0.0.2) | `HAS_Diagnosticism` / `HAS_BDUT` when those packages are detected |
 | 16th October 2026   | [**collect-cxx** 0.0.1](https://github.com/synesissoftware/collect-cxx/releases/tag/0.0.1) released | RelSt; tip helpers; CI xbit; Doxygen; CMake align |
 | 10th October 2026   | [**collect-cxx** 0.0.0](https://github.com/synesissoftware/collect-cxx/releases/tag/0.0.0) released | initial skeleton; **CMake**; Phase **4c** reporter; modular **ci.yml** |
