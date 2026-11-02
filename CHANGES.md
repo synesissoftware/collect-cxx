@@ -1,6 +1,13 @@
 # collect-cxx - Changes <!-- omit in toc -->
 
 
+## 0.0.3 - 2nd November 2026
+
+* build:
+  * **BDUT** minimum is **0.5.1**;
+  * **Diagnosticism** minimum is **0.4.3**;
+  * **STLSoft** minimum is **1.11.5**;
+
 ## 0.0.2 - 27th October 2026
 
 * Defined `HAS_Diagnosticism` / `HAS_DIAGNOSTICISM` and `HAS_BDUT` when those packages are detected;

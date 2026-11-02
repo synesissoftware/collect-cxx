@@ -2,7 +2,7 @@
 
 PROJECT_NAME           = "collect-cxx"
 PROJECT_BRIEF          = "Special and custom Collections and Containers, for C++"
-PROJECT_NUMBER         = 0.0.1
+PROJECT_NUMBER         = 0.0.3
 
 # Prefer SIS_CMAKE_BUILD_DIR-aligned output (same convention as BDUT /
 # cstring / Diagnosticism / xTests). ./dox/ remains gitignored for

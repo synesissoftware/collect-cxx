@@ -28,8 +28,8 @@ For a minimal library install with no external dependencies:
 $ ./prepare_cmake.sh --disable-examples --disable-testing -m
 ```
 
-For a full build including tests, install **STLSoft** 1.11+,
-**Diagnosticism**, and **BDUT** first, then:
+For a full build including tests, install **STLSoft** 1.11.5+,
+**Diagnosticism** **0.4.3**+, and **BDUT** **0.5.1**+ first, then:
 
 ```bash
 $ ./prepare_cmake.sh -m
@@ -55,7 +55,7 @@ exposes version macros (`COLLECT_CXX_VER_*`) and
 
 Yes. Unit-test programs live under **test/unit/** and are built when
 `BUILD_TESTING` is enabled. Run them with **run_all_unit_tests.sh**.
-Building tests requires **STLSoft**, **Diagnosticism**, and **BDUT**.
+Building tests requires **STLSoft** **1.11.5**+, **Diagnosticism** **0.4.3**+, and **BDUT** **0.5.1**+.
 
 
 ## Q5: "Where are the examples?"

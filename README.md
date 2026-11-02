@@ -42,9 +42,9 @@ so just:
 ```
 
 For a full tree (examples and tests), install via CMake:
-* [**BDUT**](https://github.com/synesissoftware/BDUT);
-* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism);
-* [**STLSoft**](https://github.com/synesissoftware/STLSoft);
+* [**BDUT**](https://github.com/synesissoftware/BDUT) **0.5.1**+;
+* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism) **0.4.3**+;
+* [**STLSoft**](https://github.com/synesissoftware/STLSoft) **1.11.5**+;
 
 then:
 
@@ -109,9 +109,9 @@ requests, and pull requests. Please use the project's
 
 For unit-testing, **collect-cxx** depends on:
 
-* [**BDUT**](https://github.com/synesissoftware/BDUT/);
-* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism/);
-* [**STLSoft**](https://github.com/synesissoftware/STLSoft/);
+* [**BDUT**](https://github.com/synesissoftware/BDUT/) **0.5.1**+;
+* [**Diagnosticism**](https://github.com/synesissoftware/Diagnosticism/) **0.4.3**+;
+* [**STLSoft**](https://github.com/synesissoftware/STLSoft/) **1.11.5**+;
 
 
 ### Related projects
