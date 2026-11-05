@@ -31,7 +31,7 @@ std::uint32_t
 api_version();
 
 
-} /* namespace collect_cxx */
+} // namespace collect_cxx
 
 
 #pragma once
