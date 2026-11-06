@@ -4,7 +4,7 @@
  * Purpose: Primary implementation file for collect-cxx core library.
  *
  * Created: 16th January 2025
- * Updated: 17th January 2025
+ * Updated: 5th November 2026
  *
  * Home:    https://github.com/synesissoftware/collect-cxx/
  *
@@ -96,7 +96,7 @@ api_version()
  * namespace
  */
 
-} /* namespace collect_cxx */
+} // namespace collect_cxx
 
 
 /* ///////////////////////////// end of file //////////////////////////// */
